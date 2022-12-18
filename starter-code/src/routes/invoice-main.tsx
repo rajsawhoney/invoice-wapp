@@ -1,11 +1,14 @@
 import ContentHeader from "../components/content-header";
 import emptyPage from "../assets/illustration-empty.svg";
+import { InvoiceList } from "../views";
+
 export default function InvoiceMain() {
   return (
     <>
       <ContentHeader />
       <div className="w-full min-h-[50vh] max-h-[100vh] overflow-y-auto flex justify-center">
-        <EmptyScreen />
+        <InvoiceList />
+        {/* <EmptyScreen /> */}
       </div>
     </>
   );

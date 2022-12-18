@@ -20,7 +20,15 @@ const ContentHeader = () => {
           <option value="2">Pending</option>
           <option value="2">Paid</option>
         </select>
-        <div className="flex items-center py-1 px-2 rounded-full bg-[#7c5df9] text-white">
+        <div
+          onClick={() => {
+            const selector = document.querySelector("#create-invoice-id");
+            if (selector) {
+              selector.setAttribute("transform", "translateX(590px)");
+            }
+          }}
+          className="flex items-center py-1 px-2 rounded-full bg-[#7c5df9] text-white cursor-pointer"
+        >
           <div className="p-[5px] bg-white rounded-full">
             <img className="w-[8px] h-[8px" src={iconPlus} alt="plus" />
           </div>

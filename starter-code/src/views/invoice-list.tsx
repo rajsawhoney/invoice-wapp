@@ -4,6 +4,7 @@ import deleteIcon from "../assets/icon-delete.svg";
 import editIcon from "../assets/icon-check.svg";
 import { deleteInvoice, populateEditData } from "../slices/invoice";
 import { expand } from "../slices/apps";
+import EmptyScreen from "../components/empty-page/empty-page";
 
 const colorsMap = {
   paid: "green",
@@ -28,6 +29,7 @@ export default function InvoiceList() {
       }, 1000);
     }
   };
+  if (lists.length == 0) return <EmptyScreen />;
 
   return (
     <div className="flex flex-col w-full">

@@ -1,6 +1,10 @@
+import { useDispatch } from "react-redux";
 import iconPlus from "../assets/icon-plus.svg";
+import { expand } from "../slices/apps";
 
 const ContentHeader = () => {
+  const dispatch = useDispatch();
+
   return (
     <div className="flex items-center w-full">
       <div>
@@ -22,10 +26,7 @@ const ContentHeader = () => {
         </select>
         <div
           onClick={() => {
-            const selector = document.querySelector("#create-invoice-id");
-            if (selector) {
-              selector.setAttribute("transform", "translateX(590px)");
-            }
+            dispatch(expand());
           }}
           className="flex items-center py-1 px-2 rounded-full bg-[#7c5df9] text-white cursor-pointer"
         >

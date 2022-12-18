@@ -1,13 +1,18 @@
-import data from "../../data.json";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+
+const colorsMap = {
+  paid: "green",
+  pending: "orange",
+  draft: "black",
+};
+
 export default function InvoiceList() {
-  const colorsMap = {
-    paid: "green",
-    pending: "orange",
-    draft: "black",
-  };
+  const lists = useSelector((state: RootState) => state.invoices.lists);
+
   return (
     <div className="flex flex-col w-full">
-      {data.map((item) => (
+      {lists.map((item) => (
         <div
           key={item.id}
           className="flex items-center justify-between bg-white dark:bg-[#1f213a] p-5 my-2 rounded shadow-sm"

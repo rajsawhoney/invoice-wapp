@@ -1,23 +1,30 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import Button from "../components/buttons/Button";
 import AddInvoiceItem from "../components/invoice-item/add-invoice-item";
+import { collapse } from "../slices/apps";
+import { createInvoice } from "../slices/invoice";
+import generateID from "../utils/generateId";
 
 const CreateInvoice = () => {
+  const dispatch = useDispatch();
+  const invoiceStatus = React.useRef<"draft" | "pending" | "paid">("draft");
+
   const [items, setItems] = React.useState<Item[]>([
     {
       name: "Banner Design",
       quantity: 1,
       price: 156.0,
       total: 156.0,
-      id: 1,
+      id: 0,
     },
     {
       name: "Email Design",
       quantity: 2,
       price: 200.0,
       total: 400.0,
-      id: 2,
+      id: 1,
     },
   ]);
 
@@ -58,7 +65,15 @@ const CreateInvoice = () => {
       return setError("items", {
         message: "At least one invoice item is required.",
       });
-    console.log("Data:", { ...data, items });
+    dispatch(
+      createInvoice({
+        ...data,
+        status: invoiceStatus.current,
+        id: generateID(),
+        items,
+      })
+    );
+    dispatch(collapse());
   };
 
   return (
@@ -313,16 +328,33 @@ const CreateInvoice = () => {
       {/* ends invoice form */}
 
       {/* footer */}
-      <div className="left-[8%] flex items-center fixed bottom-0 bg-[#151625] p-4">
-        <Button title="Discard" backgroundColor="white" color="gray" />
+      <div className="left-0 flex items-center fixed bottom-0 bg-[#151625] p-4">
+        <Button
+          onClick={() => dispatch(collapse())}
+          title="Discard"
+          backgroundColor="white"
+          color="gray"
+        />
         <div className="flex items-center justify-between ml-10">
           <Button
             title="Save as Draft"
             backgroundColor="#373b54"
             color="white"
             style={{ marginRight: "10px" }}
+            onClick={() => {
+              invoiceStatus.current = "draft";
+              handleSubmit(onSubmit)();
+            }}
           />
-          <Button title="Save & Send" backgroundColor="#7759ef" color="white" />
+          <Button
+            onClick={() => {
+              invoiceStatus.current = "paid";
+              handleSubmit(onSubmit)();
+            }}
+            title="Save & Send"
+            backgroundColor="#7759ef"
+            color="white"
+          />
         </div>
       </div>
     </div>

@@ -1,5 +1,8 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
+import deleteIcon from "../assets/icon-delete.svg";
+import editIcon from "../assets/icon-check.svg";
+import { deleteInvoice } from "../slices/invoice";
 
 const colorsMap = {
   paid: "green",
@@ -8,7 +11,19 @@ const colorsMap = {
 };
 
 export default function InvoiceList() {
+  const dispatch = useDispatch();
   const lists = useSelector((state: RootState) => state.invoices.lists);
+
+  const handleEdit = (item: InvoiceDataType) => {};
+
+  const handleDelete = (id: string) => {
+    if (window.confirm("Are you sure you want to delete invoice?")) {
+      dispatch(deleteInvoice(id));
+      setTimeout(() => {
+        alert("Invoice delete");
+      }, 1000);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -33,6 +48,12 @@ export default function InvoiceList() {
             }}
           >
             ● {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          </p>
+          <p onClick={() => handleEdit(item)}>
+            <img src={editIcon} alt="edit-icon" />
+          </p>
+          <p onClick={() => handleDelete(item.id)}>
+            <img src={deleteIcon} alt="delete-icon" />
           </p>
         </div>
       ))}

@@ -1,14 +1,20 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/buttons/Button";
 import AddInvoiceItem from "../components/invoice-item/add-invoice-item";
 import { collapse } from "../slices/apps";
-import { createInvoice } from "../slices/invoice";
+import { createInvoice, updateInvoice } from "../slices/invoice";
+import { RootState } from "../store";
 import generateID from "../utils/generateId";
 
 const CreateInvoice = () => {
   const dispatch = useDispatch();
+  const editData = useSelector(
+    (state: RootState) => state.invoices.editableInvoice
+  );
+  const editing = useSelector((state: RootState) => state.invoices.editing);
+
   const invoiceStatus = React.useRef<"draft" | "pending" | "paid">("draft");
 
   const [items, setItems] = React.useState<Item[]>([
@@ -33,6 +39,7 @@ const CreateInvoice = () => {
     handleSubmit,
     setError,
     clearErrors,
+    setValue,
     formState: { errors },
   } = useForm<InvoiceDataType>({
     defaultValues: {
@@ -60,19 +67,48 @@ const CreateInvoice = () => {
     },
   });
 
+  React.useEffect(() => {
+    if (editData) {
+      const {
+        id,
+        createdAt,
+        paymentDue,
+        description,
+        paymentTerms,
+        status,
+        clientAddress,
+        clientEmail,
+        clientName,
+        total,
+      } = editData;
+      setValue("id", id);
+      setValue("createdAt", createdAt);
+      setValue("paymentDue", paymentDue);
+      setValue("description", description);
+      setValue("paymentTerms", paymentTerms);
+      setValue("status", status);
+      setValue("clientAddress", clientAddress);
+      setValue("clientEmail", clientEmail);
+      setValue("clientName", clientName);
+      setValue("total", total);
+      invoiceStatus.current = status;
+    }
+  }, [editData]);
+
   const onSubmit: SubmitHandler<InvoiceDataType> = (data) => {
     if (items.length === 0)
       return setError("items", {
         message: "At least one invoice item is required.",
       });
-    dispatch(
-      createInvoice({
-        ...data,
-        status: invoiceStatus.current,
-        id: generateID(),
-        items,
-      })
-    );
+    const formData = {
+      ...data,
+      status: invoiceStatus.current,
+      id: editing ? data.id : generateID(),
+      items,
+    };
+    if (editing) {
+      dispatch(updateInvoice(formData));
+    } else dispatch(createInvoice(formData));
     dispatch(collapse());
   };
 

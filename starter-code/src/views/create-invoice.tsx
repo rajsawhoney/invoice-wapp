@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/buttons/Button";
 import AddInvoiceItem from "../components/invoice-item/add-invoice-item";
 import { collapse } from "../slices/apps";
-import { createInvoice, updateInvoice } from "../slices/invoice";
+import {
+  createInvoice,
+  populateEditData,
+  updateInvoice,
+} from "../slices/invoice";
 import { RootState } from "../store";
 import generateID from "../utils/generateId";
 
@@ -17,22 +21,10 @@ const CreateInvoice = () => {
 
   const invoiceStatus = React.useRef<"draft" | "pending" | "paid">("draft");
 
-  const [items, setItems] = React.useState<Item[]>([
-    {
-      name: "Banner Design",
-      quantity: 1,
-      price: 156.0,
-      total: 156.0,
-      id: 0,
-    },
-    {
-      name: "Email Design",
-      quantity: 2,
-      price: 200.0,
-      total: 400.0,
-      id: 1,
-    },
-  ]);
+  const [items, setItems] = React.useState<Item[]>([]);
+
+  const createInvoiceRef = React.useRef<HTMLDivElement>(null);
+  const expanded = useSelector((state: RootState) => state.apps.expanded);
 
   const {
     register,
@@ -40,32 +32,9 @@ const CreateInvoice = () => {
     setError,
     clearErrors,
     setValue,
+    reset,
     formState: { errors },
-  } = useForm<InvoiceDataType>({
-    defaultValues: {
-      id: "XM9141",
-      createdAt: "2021-08-21",
-      paymentDue: "2021-09-20",
-      description: "Graphic Design",
-      paymentTerms: 30,
-      clientName: "Alex Grim",
-      clientEmail: "alexgrim@mail.com",
-      status: "pending",
-      senderAddress: {
-        street: "19 Union Terrace",
-        city: "London",
-        postCode: "E1 3EZ",
-        country: "United Kingdom",
-      },
-      clientAddress: {
-        street: "84 Church Way",
-        city: "Bradford",
-        postCode: "BD1 9PB",
-        country: "United Kingdom",
-      },
-      total: 556.0,
-    },
-  });
+  } = useForm<InvoiceDataType>();
 
   React.useEffect(() => {
     if (editData) {
@@ -76,6 +45,7 @@ const CreateInvoice = () => {
         description,
         paymentTerms,
         status,
+        senderAddress,
         clientAddress,
         clientEmail,
         clientName,
@@ -87,11 +57,16 @@ const CreateInvoice = () => {
       setValue("description", description);
       setValue("paymentTerms", paymentTerms);
       setValue("status", status);
+      setValue("senderAddress", senderAddress);
       setValue("clientAddress", clientAddress);
       setValue("clientEmail", clientEmail);
       setValue("clientName", clientName);
       setValue("total", total);
+      setItems(editData.items);
       invoiceStatus.current = status;
+    } else {
+      reset();
+      setItems([]);
     }
   }, [editData]);
 
@@ -100,9 +75,15 @@ const CreateInvoice = () => {
       return setError("items", {
         message: "At least one invoice item is required.",
       });
+
+    const total = items.reduce(function (sum: number, item: Item) {
+      return sum + item.total;
+    }, 0);
+
     const formData = {
       ...data,
       status: invoiceStatus.current,
+      total,
       id: editing ? data.id : generateID(),
       items,
     };
@@ -112,13 +93,47 @@ const CreateInvoice = () => {
     dispatch(collapse());
   };
 
+  React.useEffect(() => {
+    if (expanded) {
+      createInvoiceRef.current?.style.setProperty(
+        "transform",
+        "translateX(510px)"
+      );
+    } else {
+      createInvoiceRef.current?.style.setProperty(
+        "transform",
+        "translateX(-400px)"
+      );
+    }
+  }, [expanded]);
+
+  const renderError = (message: string | undefined) => {
+    return (
+      message && (
+        <p className="text-red-600" role="alert">
+          {message}
+        </p>
+      )
+    );
+  };
+
   return (
-    <div className="relative overflow-x-hidden left-0 px-4 pt-2 pb-[10rem] min-w-[400px] w-[60%] flex flex-col max-h-[100vh] h-[100vh] overflow-y-auto bg-white dark:bg-[#151625] rounded-r-lg shadow-md">
-      <h1 className="text-[1.4rem] py-3 sticky top-[-10px] bg-white dark:bg-[#151625]">
+    <div
+      ref={createInvoiceRef}
+      style={{
+        left: "-400px",
+        transition: "all 1.2s",
+      }}
+      className="absolute overflow-x-hidden left-0 pt-2 min-w-[400px] w-[70%] flex flex-col bg-white dark:bg-[#151625] rounded-r-lg shadow-md"
+    >
+      <h1 className="text-[1.4rem] pl-5 py-3 sticky top-[-10px] bg-white dark:bg-[#151625]">
         New Invoice
       </h1>
       {/* invoice form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col mt-2">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col mt-2 px-5 max-h-[100vh] h-[100vh] overflow-y-auto pb-[10rem]"
+      >
         {/* Sender Details */}
         <span className="text-[#7759ef]">Bill From</span>
         <div className="flex flex-col">
@@ -136,13 +151,16 @@ const CreateInvoice = () => {
                 message: `Street address is required.`,
               },
             })}
-            name="senderAddress.street"
           />
+          {renderError(errors.senderAddress?.street?.message)}
         </div>
 
         <div className={`grid grid-cols-3 gap-2 my-2`}>
           <div className="flex flex-col">
-            <label className="invoice-form-label" htmlFor={"city"}>
+            <label
+              className="invoice-form-label"
+              htmlFor={"senderAddress.city"}
+            >
               City
             </label>
             <input
@@ -153,11 +171,14 @@ const CreateInvoice = () => {
                   message: `City is required.`,
                 },
               })}
-              name="city"
             />
+            {renderError(errors.senderAddress?.city?.message)}
           </div>
           <div className="flex flex-col">
-            <label className="invoice-form-label" htmlFor={"postCode"}>
+            <label
+              className="invoice-form-label"
+              htmlFor={"senderAddress.postCode"}
+            >
               Post Code
             </label>
             <input
@@ -168,12 +189,15 @@ const CreateInvoice = () => {
                   message: `Post Code is required.`,
                 },
               })}
-              name="postCode"
             />
+            {renderError(errors.senderAddress?.postCode?.message)}
           </div>
 
           <div className="flex flex-col">
-            <label className="invoice-form-label" htmlFor={"country"}>
+            <label
+              className="invoice-form-label"
+              htmlFor={"senderAddress.country"}
+            >
               Country
             </label>
             <input
@@ -184,8 +208,8 @@ const CreateInvoice = () => {
                   message: `Country is required.`,
                 },
               })}
-              name="country"
             />
+            {renderError(errors.senderAddress?.country?.message)}
           </div>
         </div>
 
@@ -203,8 +227,8 @@ const CreateInvoice = () => {
                 message: `Street address is required.`,
               },
             })}
-            name="clientName"
           />
+          {renderError(errors.clientName?.message)}
         </div>
 
         <div className="flex flex-col">
@@ -213,14 +237,15 @@ const CreateInvoice = () => {
           </label>
           <input
             className="invoice-form-input dark:bg-[#1f213a]"
+            type={"email"}
             {...register("clientEmail", {
               required: {
                 value: true,
                 message: `Street address is required.`,
               },
             })}
-            name="clientEmail"
           />
+          {renderError(errors.clientEmail?.message)}
         </div>
 
         <div className="flex flex-col">
@@ -238,8 +263,8 @@ const CreateInvoice = () => {
                 message: `Street address is required.`,
               },
             })}
-            name="clientAddress.street"
           />
+          {renderError(errors.clientAddress?.street?.message)}
         </div>
 
         <div className={`grid grid-cols-3 gap-2 my-2`}>
@@ -258,8 +283,8 @@ const CreateInvoice = () => {
                   message: `City is required.`,
                 },
               })}
-              name="clientAddress"
             />
+            {renderError(errors.clientAddress?.city?.message)}
           </div>
           <div className="flex flex-col">
             <label
@@ -276,8 +301,8 @@ const CreateInvoice = () => {
                   message: `Post Code is required.`,
                 },
               })}
-              name="clientAddress.postCode"
             />
+            {renderError(errors.clientAddress?.postCode?.message)}
           </div>
 
           <div className="flex flex-col">
@@ -295,8 +320,8 @@ const CreateInvoice = () => {
                   message: `Country is required.`,
                 },
               })}
-              name="clientAddress.country"
             />
+            {renderError(errors.clientAddress?.country?.message)}
           </div>
         </div>
 
@@ -307,14 +332,15 @@ const CreateInvoice = () => {
             </label>
             <input
               className="invoice-form-input dark:bg-[#1f213a]"
+              type={"date"}
               {...register("createdAt", {
                 required: {
                   value: true,
                   message: `Issue date is required.`,
                 },
               })}
-              name="createdAt"
             />
+            {renderError(errors.createdAt?.message)}
           </div>
           <div className="flex flex-col">
             <label className="invoice-form-label" htmlFor={"paymentTerms"}>
@@ -328,14 +354,14 @@ const CreateInvoice = () => {
                   message: `Payment terms is required.`,
                 },
               })}
-              name="paymentTerms"
             />
+            {renderError(errors.paymentTerms?.message)}
           </div>
         </div>
 
         <div className="flex flex-col">
           <label className="invoice-form-label" htmlFor={"description"}>
-            Payment Terms
+            Project description
           </label>
           <input
             className="invoice-form-input dark:bg-[#1f213a]"
@@ -345,8 +371,8 @@ const CreateInvoice = () => {
                 message: `Project description is required.`,
               },
             })}
-            name="description"
           />
+          {renderError(errors.description?.message)}
         </div>
 
         {/* Items Adder */}
@@ -355,18 +381,17 @@ const CreateInvoice = () => {
           setItems={setItems}
           clearErrors={clearErrors}
         />
-        {errors.items && (
-          <p className="text-red-600" role="alert">
-            {errors.items?.message}
-          </p>
-        )}
+        {renderError(errors.items?.message)}
       </form>
       {/* ends invoice form */}
 
       {/* footer */}
-      <div className="left-0 flex items-center fixed bottom-0 bg-[#151625] p-4">
+      <div className="left-0 flex items-center fixed bottom-[60px] bg-[#151625] p-4">
         <Button
-          onClick={() => dispatch(collapse())}
+          onClick={() => {
+            dispatch(collapse());
+            dispatch(populateEditData({ data: null, status: false }));
+          }}
           title="Discard"
           backgroundColor="white"
           color="gray"

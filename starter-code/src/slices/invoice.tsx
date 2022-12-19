@@ -1,13 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import invoiceData from "../../data.json";
+import {
+  getItemsFromLocalStorage,
+  updateInvoiceStore,
+} from "../utils/localStorage";
 export interface InVoiceState {
   lists: InvoiceDataType[];
+  filteredList: InvoiceDataType[];
   editableInvoice: InvoiceDataType | null;
   editing: boolean;
 }
 
+const localInvoices: InvoiceDataType[] = getItemsFromLocalStorage();
+
 const initialState: InVoiceState = {
-  lists: invoiceData,
+  lists: localInvoices,
+  filteredList: localInvoices,
   editableInvoice: null,
   editing: false,
 };
@@ -18,10 +25,25 @@ export const invoiceSlice = createSlice({
   reducers: {
     createInvoice: (state, action: PayloadAction<InvoiceDataType>) => {
       state.lists = [...state.lists, action.payload];
+      state.filteredList = [...state.filteredList, action.payload];
+      updateInvoiceStore(state.lists);
     },
-    populateEditData: (state, action: PayloadAction<InvoiceDataType>) => {
-      state.editableInvoice = action.payload;
-      state.editing = true;
+    filterByStatus: (state, action: PayloadAction<string>) => {
+      if (!action.payload) state.filteredList = state.lists;
+      else
+        state.filteredList = state.lists.filter(
+          (item) => item.status === action.payload
+        );
+    },
+    populateEditData: (
+      state,
+      action: PayloadAction<{
+        data: InvoiceDataType | null;
+        status: boolean;
+      }>
+    ) => {
+      state.editableInvoice = action.payload.data;
+      state.editing = action.payload.status;
     },
     updateInvoice: (state, action: PayloadAction<InvoiceDataType>) => {
       const index = state.lists.findIndex(
@@ -29,20 +51,35 @@ export const invoiceSlice = createSlice({
       );
       if (index > -1) {
         state.lists.splice(index, 1, action.payload);
+        const index2 = state.filteredList.findIndex(
+          (item) => item.id === action.payload.id
+        );
+        state.filteredList.splice(index2, 1, action.payload);
       } else {
-        state.lists = [...state.lists, action.payload];
+        alert("Invoice id mis-match!!");
       }
       state.lists = state.lists;
+      state.filteredList = state.filteredList;
       state.editing = false;
+      updateInvoiceStore(state.lists);
     },
     deleteInvoice: (state, action: PayloadAction<string>) => {
       state.lists = state.lists.filter((item) => item.id !== action.payload);
+      state.filteredList = state.filteredList.filter(
+        (item) => item.id !== action.payload
+      );
+      updateInvoiceStore(state.lists);
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { createInvoice, populateEditData, updateInvoice, deleteInvoice } =
-  invoiceSlice.actions;
+export const {
+  createInvoice,
+  populateEditData,
+  filterByStatus,
+  updateInvoice,
+  deleteInvoice,
+} = invoiceSlice.actions;
 
 export default invoiceSlice.reducer;

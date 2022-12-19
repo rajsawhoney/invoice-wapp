@@ -1,28 +1,37 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import iconPlus from "../assets/icon-plus.svg";
 import { expand } from "../slices/apps";
+import { filterByStatus } from "../slices/invoice";
+import { RootState } from "../store";
 
 const ContentHeader = () => {
   const dispatch = useDispatch();
+  const lists = useSelector((state: RootState) => state.invoices.filteredList);
 
   return (
-    <div className="flex items-center w-full">
+    <div className="sticky top-0 bg-white dark:bg-[#151625] flex items-center w-full px-2">
       <div>
         <h1>Invoices</h1>
-        <span>No Invoices</span>
+        <span>
+          {lists.length > 0
+            ? `There are ${lists.length} total invoices`
+            : "No Invoices"}
+        </span>
       </div>
       <div className="ml-auto flex items-center">
         <label className="mr-2" htmlFor="filter">
           Filter by status
         </label>
         <select
-          className="dark:bg-[#151625] mr-2"
+          className="bg-white dark:bg-[#151625] mr-2 bottom-1"
           name="filter"
           placeholder="Filter by status"
+          onChange={(e) => dispatch(filterByStatus(e.target.value))}
         >
-          <option value="1">Draft</option>
-          <option value="2">Pending</option>
-          <option value="2">Paid</option>
+          <option value="">All</option>
+          <option value="draft">Draft</option>
+          <option value="pending">Pending</option>
+          <option value="paid">Paid</option>
         </select>
         <div
           onClick={() => {

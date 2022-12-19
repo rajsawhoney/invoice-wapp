@@ -1,7 +1,6 @@
 import logo from "../../assets/logo.svg";
 import sun from "../../assets/icon-sun.svg";
 import moon from "../../assets/icon-moon.svg";
-import avatar from "../../assets/image-avatar.jpg";
 import { ChangeEvent } from "react";
 
 export default function Sidebar() {
@@ -30,7 +29,13 @@ export default function Sidebar() {
           <option value={"dark"}>🌙 Dark</option>
         </select>
         <hr className="w-full bg-gray-400 dark:bg-gray-300 mt-3" />
-        <img className="rounded-full w-14 my-3" src={avatar} alt="avatar" />
+        <img
+          className="rounded-full w-14 my-3"
+          src={
+            "https://lh3.googleusercontent.com/ogw/AOh-ky0HyvfFbcWBjBaMl0wZ2Y4NqsI3pftgunXkNVHvzg=s64-c-mo"
+          }
+          alt="avatar"
+        />
       </div>
     </>
   );

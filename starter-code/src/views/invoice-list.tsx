@@ -9,15 +9,15 @@ import EmptyScreen from "../components/empty-page/empty-page";
 const colorsMap = {
   paid: "green",
   pending: "orange",
-  draft: "black",
+  draft: "gray",
 };
 
 export default function InvoiceList() {
   const dispatch = useDispatch();
-  const lists = useSelector((state: RootState) => state.invoices.lists);
+  const lists = useSelector((state: RootState) => state.invoices.filteredList);
 
   const handleEdit = (item: InvoiceDataType) => {
-    dispatch(populateEditData(item));
+    dispatch(populateEditData({ data: item, status: true }));
     dispatch(expand());
   };
 
@@ -52,11 +52,16 @@ export default function InvoiceList() {
             style={{
               color: colorsMap[item.status as "paid"],
             }}
+            className="font-medium"
           >
             ● {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
           </p>
           <p className="cursor-pointer" onClick={() => handleEdit(item)}>
-            <img src={editIcon} alt="edit-icon" />
+            <img
+              className="bg-gray-400 dark:bg-[#1f213a] w-[20px] p-[1px]"
+              src={editIcon}
+              alt="edit-icon"
+            />
           </p>
           <p className="cursor-pointer" onClick={() => handleDelete(item.id)}>
             <img src={deleteIcon} alt="delete-icon" />

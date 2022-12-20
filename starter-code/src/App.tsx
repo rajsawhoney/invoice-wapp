@@ -27,7 +27,7 @@ function App() {
             dispatch(populateEditData({ data: null, status: false }));
           }
         }}
-        className="md:w-[75%] sm:w-[95%] mt-10 px-4 mx-auto pb-[10%] overflow-x-hidden"
+        className="ml-[17%] md:w-[75%] sm:w-[95%] mt-10 px-4 mx-auto pb-[10%] overflow-x-hidden"
       >
         <Outlet />
       </div>

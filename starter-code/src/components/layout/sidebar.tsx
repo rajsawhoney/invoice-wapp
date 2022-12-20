@@ -1,16 +1,23 @@
+import React from "react";
 import logo from "../../assets/logo.svg";
 import sun from "../../assets/icon-sun.svg";
 import moon from "../../assets/icon-moon.svg";
-import { ChangeEvent } from "react";
 
 export default function Sidebar() {
-  const handleDarkLightMode = (e: ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.theme = e.target.value;
+  const [darkMode, setDarkMode] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setDarkMode(
+      localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+    );
+  }, []);
+
+  const toggleDarkMode = () => {
+    document.documentElement.classList.toggle("dark");
+    localStorage.theme = darkMode ? "light" : "dark";
+    setDarkMode(!darkMode);
     window.dispatchEvent(new Event("storage"));
   };
 
@@ -20,14 +27,9 @@ export default function Sidebar() {
         <img src={logo} alt="brand-logo" />
       </div>
       <div className="flex flex-col items-center mt-auto">
-        <select
-          className="bg-gray-800 text-white outline-none cursor-pointer"
-          defaultValue={localStorage.theme}
-          onChange={handleDarkLightMode}
-        >
-          <option value={"light"}>🔆 Light</option>
-          <option value={"dark"}>🌙 Dark</option>
-        </select>
+        <button className="mb-4 p-3" onClick={toggleDarkMode}>
+          <img src={darkMode ? sun : moon} alt="dark-light-mode" />
+        </button>
         <hr className="w-full bg-gray-400 dark:bg-gray-300 mt-3" />
         <img
           className="rounded-full w-14 my-3"

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 import {
   getItemsFromLocalStorage,
   updateInvoiceStore,
@@ -27,6 +28,9 @@ export const invoiceSlice = createSlice({
       state.lists = [...state.lists, action.payload];
       state.filteredList = [...state.filteredList, action.payload];
       updateInvoiceStore(state.lists);
+      toast("New invoice created.", {
+        type: "success",
+      });
     },
     filterByStatus: (state, action: PayloadAction<string>) => {
       if (!action.payload) state.filteredList = state.lists;
@@ -57,11 +61,17 @@ export const invoiceSlice = createSlice({
         state.filteredList.splice(index2, 1, action.payload);
       } else {
         alert("Invoice id mis-match!!");
+        toast("Invoice id mis-match!!", {
+          type: "error",
+        });
       }
       state.lists = state.lists;
       state.filteredList = state.filteredList;
       state.editing = false;
       updateInvoiceStore(state.lists);
+      toast("Invoice updated successfully.", {
+        type: "success",
+      });
     },
     deleteInvoice: (state, action: PayloadAction<string>) => {
       state.lists = state.lists.filter((item) => item.id !== action.payload);
@@ -69,6 +79,9 @@ export const invoiceSlice = createSlice({
         (item) => item.id !== action.payload
       );
       updateInvoiceStore(state.lists);
+      toast("Invoice deleted successfully.", {
+        type: "success",
+      });
     },
   },
 });

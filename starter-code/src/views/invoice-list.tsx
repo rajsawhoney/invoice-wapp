@@ -24,9 +24,6 @@ export default function InvoiceList() {
   const handleDelete = (id: string) => {
     if (window.confirm("Are you sure you want to delete invoice?")) {
       dispatch(deleteInvoice(id));
-      setTimeout(() => {
-        alert("Invoice delete");
-      }, 1000);
     }
   };
   if (lists.length == 0) return <EmptyScreen />;

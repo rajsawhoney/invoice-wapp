@@ -1,6 +1,6 @@
 ### Objective
 
-Your challenge is to build out this invoicing application for Social Knowledge, LLC's accounting department and get it looking as close to the design as possible.
+Your challenge is to build out this invoicing application for any company's accounting department and get it looking as close to the design as possible.
 
 ### Brief
 
@@ -49,8 +49,6 @@ Your users should be able to:
 
 ### CodeSubmit
 
-Please organize, design, test, and document your code as if it were going into production - then push your changes to the master branch. After you have pushed your code, you may submit the assignment on the assignment page.
+Please organize, design, test, and document your code as if it were going into production - then push your changes to the master branch.
 
 **Have fun building!** 🚀
-
-The Social Knowledge, LLC Team

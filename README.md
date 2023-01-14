@@ -53,4 +53,4 @@ Please organize, design, test, and document your code as if it were going into p
 
 **Have fun building!** 🚀
 
-You can view this build here: https://invoice-wapp.web.app/
+You can view its minimalistic build here: https://invoice-wapp.web.app/

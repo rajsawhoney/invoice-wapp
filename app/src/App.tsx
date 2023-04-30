@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./components/layout/sidebar";
+
 import { collapse } from "./slices/apps";
 import { populateEditData } from "./slices/invoice";
 import { RootState } from "./store";

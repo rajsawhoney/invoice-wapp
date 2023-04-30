@@ -1,0 +1,55 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "CR5X5FGLKU.com.luna-app"
+        ],
+        "components": [
+          {
+            "#": "no_universal_links",
+            "exclude": true,
+            "comment": "Matches any URL whose fragment equals no_universal_links and instructs the system not to open it as a universal link"
+          },
+          {
+            "/": "/plaid/*",
+            "comment": "Matches any URL whose path starts with /buy/"
+          },
+          {
+            "/": "/plaid/id/*",
+            "exclude": true,
+            "comment": "Matches any URL whose path starts with /help/website/ and instructs the system not to open it as a universal link"
+          },
+          {
+            "/": "/help/*",
+            "?": {
+              "articleNumber": "????"
+            },
+            "comment": "Matches any URL whose path starts with /help/ and which has a query item with name 'articleNumber' and a value of exactly 4 characters"
+          }
+        ]
+      },
+      {
+        "appID": "CR5X5FGLKU.com.luna-app",
+        "paths": [
+          "/plaid/*",
+          "/plaid/id/*",
+          "/help/*"
+        ]
+      },
+      {
+        "appID": "CR5X5FGLKU.com.luna-app",
+        "paths": [
+          "/plaid",
+          "/plaid/id/*"
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "CR5X5FGLKU.com.luna-app"
+    ]
+  }
+}

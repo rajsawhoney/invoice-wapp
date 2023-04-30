@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.luna.app",
+      "sha256_cert_fingerprints": [
+        "56:F0:09:35:CB:7A:4E:68:5B:87:1C:6B:6D:42:CF:47:59:99:9E:47:88:F9:34:7A:41:A9:8B:66:8D:38:2E:87"
+      ]
+    }
+  }
+]

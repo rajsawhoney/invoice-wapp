@@ -59,3 +59,10 @@ h1 {
   font-weight: 500;
   font-size: 15px;
 }
+.header-link {
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  font-size: larger;
+  margin: 0 2rem;
+}

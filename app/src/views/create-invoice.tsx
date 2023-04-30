@@ -70,7 +70,7 @@ const CreateInvoice = () => {
     }
   }, [editData]);
 
-  const onSubmit: SubmitHandler<InvoiceDataType> = (data) => {
+  const onSubmit: SubmitHandler<InvoiceDataType> = (data: InvoiceDataType) => {
     if (items.length === 0)
       return setError("items", {
         message: "At least one invoice item is required.",
@@ -84,7 +84,7 @@ const CreateInvoice = () => {
       ...data,
       status: invoiceStatus.current,
       total,
-      id: editing ? data.id : generateID(),
+      id: editing ? data?.id : generateID(),
       items,
     };
     if (editing) {

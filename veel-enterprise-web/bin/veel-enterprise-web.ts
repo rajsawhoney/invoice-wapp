@@ -6,7 +6,7 @@ const app = new cdk.App();
 
 const environments = {
   Development: {
-    env: { account: "915025938950", region: "us-east-1" },
+    env: { account: "<aws-account-id>", region: "us-east-1" },
     branchName: "dev",
     domainName: "veelapp.com",
     domainPrefix: "dev",

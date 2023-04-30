@@ -1,0 +1,50 @@
+name: Deploy Amplify Stack - Dev
+on:
+    workflow_dispatch: {}
+
+jobs:
+    build-cdk:
+        runs-on: ubuntu-latest
+        container: public.ecr.aws/d0d5d9b5/ciimages:latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Synthesize CDK Stack
+              run: |
+                  cd veel-enterprise-web
+                  yarn install
+                  cdk synth
+
+            - name: Save cdk.out to artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                  name: cdk.out
+                  path: veel-enterprise-web/cdk.out
+
+    deploy:
+        needs:
+            - build-cdk
+        runs-on: ubuntu-latest
+        container: public.ecr.aws/d0d5d9b5/ciimages:latest
+        timeout-minutes: 15
+        environment: Development
+        steps:
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_BUILD_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_BUILD_ACCESS_KEY_SECRET }}
+                  aws-region: ${{ secrets.AWS_BUILD_REGION }}
+
+            - name: Download cdk.out from artifacts
+              uses: actions/download-artifact@v2
+              with:
+                  name: cdk.out
+                  path: cdk.out
+
+            - name: Deploy to Development
+              run: |
+                  cdk diff --app cdk.out --require-approval never VeelEnterpriseWebStack-Development
+                  cdk deploy --app cdk.out --require-approval never VeelEnterpriseWebStack-Development
